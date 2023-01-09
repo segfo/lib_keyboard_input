@@ -120,33 +120,33 @@ fn keyboard_impl_test2() {
         });
     keyboard_impl.send_key();
 }
+// 実装を叩くテストなのでコメントアウト。
+// #[test]
+// fn input_test() {
+//     let mut keyboard_impl = crate::keyboard::windows::Keyboard::new();
+//     for c in ['あ', '🍣', 'a', 'A', '`', '@'] {
+//         KeycodeBuilder::default()
+//             .char_build(c)
+//             .iter()
+//             .for_each(|key_code| {
+//                 println!("{:?}", key_code);
+//                 keyboard_impl.append_input_chain(key_code.clone())
+//             });
+//     }
+//     keyboard_impl.send_key();
+// }
 
-#[test]
-fn input_test() {
-    let mut keyboard_impl = crate::keyboard::windows::Keyboard::new();
-    for c in ['あ', '🍣', 'a', 'A', '`', '@'] {
-        KeycodeBuilder::default()
-            .char_build(c)
-            .iter()
-            .for_each(|key_code| {
-                println!("{:?}", key_code);
-                keyboard_impl.append_input_chain(key_code.clone())
-            });
-    }
-    keyboard_impl.send_key();
-}
-
-#[test]
-fn input_test2() {
-    let mut keyboard_impl = crate::keyboard::windows::Keyboard::new();
-    for c in 0x21..0x7f {
-        KeycodeBuilder::default()
-            .char_build(char::from_u32(c).unwrap())
-            .iter()
-            .for_each(|key_code| {
-                println!("{:?}", key_code);
-                keyboard_impl.append_input_chain(key_code.clone())
-            });
-    }
-    keyboard_impl.send_key();
-}
+// #[test]
+// fn input_test2() {
+//     let mut keyboard_impl = crate::keyboard::windows::Keyboard::new();
+//     for c in 0x21..0x7f {
+//         KeycodeBuilder::default()
+//             .char_build(char::from_u32(c).unwrap())
+//             .iter()
+//             .for_each(|key_code| {
+//                 println!("{:?}", key_code);
+//                 keyboard_impl.append_input_chain(key_code.clone())
+//             });
+//     }
+//     keyboard_impl.send_key();
+// }
