@@ -145,6 +145,7 @@ impl KeycodeBuilder {
         if char.is_ascii() {
             let (shift, ctrl, vk) = unsafe {
                 let kl = GetKeyboardLayout(0);
+                // 文字 から VirtualKey へ変換する
                 let vk = VIRTUAL_KEY(VkKeyScanExA(CHAR(char as u8), kl) as u16);
                 ((vk.0 & 0x100) != 0, (vk.0 & 0x200) != 0, vk)
             };
@@ -153,7 +154,8 @@ impl KeycodeBuilder {
             shift_act.action(&mut self.data);
             let mut kc = KeyCode::default();
             kc.vk = VIRTUAL_KEY(vk.0 & 0xff);
-            kc.scan_code = char as u16;
+            // VirtualKeyからスキャンコードへ変換する
+            kc.scan_code = virtual_key_to_scancode(vk);
             self.data.push(kc);
             shift_act.action(&mut self.data);
         } else {

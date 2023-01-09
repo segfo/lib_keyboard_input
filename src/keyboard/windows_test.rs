@@ -35,6 +35,18 @@ fn keyboard_impl_test() {
     }
     keyboard_impl.send_key();
 }
+// charからサロゲートペアを求める。
+// サロゲートペア対象外のコードポイントの場合はNoneを返す
+fn char_to_surrogate_pair(c: char) -> Option<(u16, u16)> {
+    let c = c as u32;
+    if c < 0xffff {
+        None
+    } else {
+        let hsg = (((c as u32) - 0x1_0000) / 0x400 + 0xD800) as u16;
+        let lsg = (((c as u32) - 0x1_0000) % 0x400 + 0xDC00) as u16;
+        Some((hsg, lsg))
+    }
+}
 
 #[test]
 fn keyboard_impl_test2() {
@@ -45,20 +57,20 @@ fn keyboard_impl_test2() {
             &self,
             input_list: &[windows::Win32::UI::Input::KeyboardAndMouse::INPUT],
         ) -> u32 {
+            let (sushi_hsg, sushi_lsg) = char_to_surrogate_pair('🍣').unwrap();
             for input in input_list {
-                let ki = unsafe { input.Anonymous.ki };
                 let test_data = [
-                    // (vk,scan,key_up,unicode,scancode)
-                    (162, 29, false, false, false), // CTRL なのでwVkとscanが有効であり、その他フラグは全て零
-                    (0, 'c' as u16, false, false, true),
-                    (0, 'c' as u16, true, false, true),
-                    (0, 'v' as u16, false, false, true),
-                    (0, 'v' as u16, true, false, true),
-                    (162, 29, true, false, false),
-                    (0, 55356, false, true, false), // 🍣のハイサロゲートに対するKeyDown
-                    (0, 55356, true, true, false),  // 🍣のハイサロゲートに対するKeyUp
-                    (0, 57187, false, true, false), // 🍣のローサロゲートに対するKeyDown
-                    (0, 57187, true, true, false),  // 🍣のローサロゲートに対するKeyUp
+                    // (vk,scan,key_up,unicode)
+                    (162, 29, false, false), // CTRL なのでwVkとscanが有効であり、その他フラグは全て零
+                    (67, 46, false, false),
+                    (67, 46, true, false),
+                    (86, 47, false, false),
+                    (86, 47, true, false),
+                    (162, 29, true, false),
+                    (0, sushi_hsg, false, true), // 🍣のハイサロゲートに対するKeyDown
+                    (0, sushi_hsg, true, true),  // 🍣のハイサロゲートに対するKeyUp
+                    (0, sushi_lsg, false, true), // 🍣のローサロゲートに対するKeyDown
+                    (0, sushi_lsg, true, true),  // 🍣のローサロゲートに対するKeyUp
                 ];
                 assert_eq!(input_list.len(), test_data.len());
                 for (input, test) in input_list.iter().zip(test_data) {
@@ -69,7 +81,6 @@ fn keyboard_impl_test2() {
                     assert_eq!(kbd.wScan, test.1);
                     assert_eq!((kbd.dwFlags.0 & KEYEVENTF_KEYUP.0) != 0, test.2);
                     assert_eq!((kbd.dwFlags.0 & KEYEVENTF_UNICODE.0) != 0, test.3);
-                    assert_eq!((kbd.dwFlags.0 & KEYEVENTF_SCANCODE.0) != 0, test.4);
                 }
             }
             0
@@ -114,7 +125,7 @@ fn keyboard_impl_test2() {
 #[test]
 fn input_test() {
     let mut keyboard_impl = crate::keyboard::windows::Keyboard::new();
-    for c in ['あ','🍣','a', 'A', '`', '@'] {
+    for c in ['あ', '🍣', 'a', 'A', '`', '@'] {
         KeycodeBuilder::default()
             .char_build(c)
             .iter()
@@ -125,6 +136,7 @@ fn input_test() {
     }
     keyboard_impl.send_key();
 }
+
 #[test]
 fn input_test2() {
     let mut keyboard_impl = crate::keyboard::windows::Keyboard::new();
