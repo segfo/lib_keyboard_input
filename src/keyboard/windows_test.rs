@@ -58,30 +58,28 @@ fn keyboard_impl_test2() {
             input_list: &[windows::Win32::UI::Input::KeyboardAndMouse::INPUT],
         ) -> u32 {
             let (sushi_hsg, sushi_lsg) = char_to_surrogate_pair('🍣').unwrap();
-            for input in input_list {
-                let test_data = [
-                    // (vk,scan,key_up,unicode)
-                    (162, 29, false, false), // CTRL なのでwVkとscanが有効であり、その他フラグは全て零
-                    (67, 46, false, false),
-                    (67, 46, true, false),
-                    (86, 47, false, false),
-                    (86, 47, true, false),
-                    (162, 29, true, false),
-                    (0, sushi_hsg, false, true), // 🍣のハイサロゲートに対するKeyDown
-                    (0, sushi_hsg, true, true),  // 🍣のハイサロゲートに対するKeyUp
-                    (0, sushi_lsg, false, true), // 🍣のローサロゲートに対するKeyDown
-                    (0, sushi_lsg, true, true),  // 🍣のローサロゲートに対するKeyUp
-                ];
-                assert_eq!(input_list.len(), test_data.len());
-                for (input, test) in input_list.iter().zip(test_data) {
-                    let kbd = unsafe { input.Anonymous.ki };
-                    println!("{:?}", kbd);
-                    let kbd = unsafe { input.Anonymous.ki };
-                    assert_eq!(kbd.wVk.0, test.0);
-                    assert_eq!(kbd.wScan, test.1);
-                    assert_eq!((kbd.dwFlags.0 & KEYEVENTF_KEYUP.0) != 0, test.2);
-                    assert_eq!((kbd.dwFlags.0 & KEYEVENTF_UNICODE.0) != 0, test.3);
-                }
+            let test_data = [
+                // (vk,scan,key_up,unicode)
+                (162, 29, false, false), // CTRL なのでwVkとscanが有効であり、その他フラグは全て零
+                (67, 46, false, false),
+                (67, 46, true, false),
+                (86, 47, false, false),
+                (86, 47, true, false),
+                (162, 29, true, false),
+                (0, sushi_hsg, false, true), // 🍣のハイサロゲートに対するKeyDown
+                (0, sushi_hsg, true, true),  // 🍣のハイサロゲートに対するKeyUp
+                (0, sushi_lsg, false, true), // 🍣のローサロゲートに対するKeyDown
+                (0, sushi_lsg, true, true),  // 🍣のローサロゲートに対するKeyUp
+            ];
+            assert_eq!(input_list.len(), test_data.len());
+            for (input, test) in input_list.iter().zip(test_data) {
+                let kbd = unsafe { input.Anonymous.ki };
+                println!("{:?}", kbd);
+                let kbd = unsafe { input.Anonymous.ki };
+                assert_eq!(kbd.wVk.0, test.0);
+                assert_eq!(kbd.wScan, test.1);
+                assert_eq!((kbd.dwFlags.0 & KEYEVENTF_KEYUP.0) != 0, test.2);
+                assert_eq!((kbd.dwFlags.0 & KEYEVENTF_UNICODE.0) != 0, test.3);
             }
             0
         }
