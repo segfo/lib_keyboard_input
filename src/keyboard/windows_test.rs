@@ -55,10 +55,10 @@ fn keyboard_impl_test2() {
                     (0, 'v' as u16, false, false, true),
                     (0, 'v' as u16, true, false, true),
                     (162, 29, true, false, false),
-                    (0, 55356, false, true, false), // 🍣の1個め KeyDown
-                    (0, 55356, true, true, false),  // 🍣の1個め KeyUp
-                    (0, 57187, false, true, false), // 🍣の2個め KeyDown
-                    (0, 57187, true, true, false),  // 🍣の2個め KeyUp
+                    (0, 55356, false, true, false), // 🍣のハイサロゲートに対するKeyDown
+                    (0, 55356, true, true, false),  // 🍣のハイサロゲートに対するKeyUp
+                    (0, 57187, false, true, false), // 🍣のローサロゲートに対するKeyDown
+                    (0, 57187, true, true, false),  // 🍣のローサロゲートに対するKeyUp
                 ];
                 assert_eq!(input_list.len(), test_data.len());
                 for (input, test) in input_list.iter().zip(test_data) {
