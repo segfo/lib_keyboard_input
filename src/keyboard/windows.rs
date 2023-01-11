@@ -15,6 +15,12 @@ impl Keyboard {
             inner: KeyboardImpl::new_impl(),
         }
     }
+    pub fn new_delay(&mut self, delay_millis: u64) -> &Self {
+        if delay_millis > 0 {
+            self.inner.sender = KeyboardImpl::new_delay_impl(delay_millis).sender;
+        }
+        self
+    }
 }
 impl KeyboardTrait for Keyboard {
     fn send_key(&mut self) {
@@ -186,7 +192,7 @@ impl KeycodeBuilder {
         self
     }
     pub fn flags(&mut self, flags: u32) -> &mut Self {
-        self.key_code.flags=flags;
+        self.key_code.flags = flags;
         self
     }
     pub fn build(&self) -> KeyCode {

@@ -1,7 +1,6 @@
-use std::collections::VecDeque;
+use std::time::Duration;
 use windows::Win32::UI::Input::KeyboardAndMouse::*;
-
-use super::windows::{KeyCode, KeyboardTrait, KeySendMode};
+use super::windows::{KeyCode, KeySendMode, KeyboardTrait};
 
 pub trait SendInputApi {
     fn send_input(&self, input_list: &[INPUT]) -> u32;
@@ -16,6 +15,26 @@ impl Default for SendInputApiImpl {
 impl SendInputApi for SendInputApiImpl {
     fn send_input(&self, input_list: &[INPUT]) -> u32 {
         unsafe { SendInput(input_list, std::mem::size_of::<INPUT>() as i32) }
+    }
+}
+
+struct SendInputApiDelayedImpl {
+    delay_millis: u64,
+}
+impl SendInputApiDelayedImpl {
+    fn new(delay_millis: u64) -> Self {
+        SendInputApiDelayedImpl {
+            delay_millis: delay_millis,
+        }
+    }
+}
+impl SendInputApi for SendInputApiDelayedImpl {
+    fn send_input(&self, input_list: &[INPUT]) -> u32 {
+        for input in input_list{
+            unsafe { SendInput(&[*input], std::mem::size_of::<INPUT>() as i32) };
+            std::thread::sleep(Duration::from_millis(self.delay_millis));
+        }
+        0
     }
 }
 
@@ -61,6 +80,12 @@ impl KeyboardImpl {
         KeyboardImpl {
             keycode_chain: Vec::new(),
             sender: Box::new(SendInputApiImpl::default()),
+        }
+    }
+    pub fn new_delay_impl(delay_millis: u64) -> Self {
+        KeyboardImpl {
+            keycode_chain: Vec::new(),
+            sender: Box::new(SendInputApiDelayedImpl::new(delay_millis)),
         }
     }
 }
