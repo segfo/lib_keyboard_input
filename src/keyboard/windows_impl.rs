@@ -98,9 +98,8 @@ pub fn keyinput_generator_detail(vk: VIRTUAL_KEY, scan: u16, flags: KEYBD_EVENT_
     kbd.dwFlags = flags;
     kbd.time = 0;
     // ExtraInfoは特に意味のある値ではない。
-    // このアプリから生成されたことを主張するだけの値。（物理キーの入力ではないという印）
-    // もちろん他のアプリがこの値を設定してたら区別はつかないだろう。
-    // ただし、物理キーボード入力は常に0であるのでそれとかぶらなければ正直何でも良いので12345という値にしている。
+    // このアプリから生成されたことを主張するだけの数値
+    // KBDLLHOOKSTRUCT.dw_flagsでも判別は可能であるのであくまでもデバッグ支援用の値となる
     kbd.dwExtraInfo = 12345;
 
     let mut input = INPUT::default();

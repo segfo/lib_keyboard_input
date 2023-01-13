@@ -1,8 +1,6 @@
 use crate::keyboard::windows_impl::*;
 use windows::Win32::UI::{Input::KeyboardAndMouse::*, WindowsAndMessaging::MAPVK_VK_TO_VSC};
 
-use super::windows_impl;
-
 // Keyboard構造体やその実装は
 // 外部公開するだけのためのI/Fにすぎないので、innerを呼び出すだけ。
 pub struct Keyboard {
