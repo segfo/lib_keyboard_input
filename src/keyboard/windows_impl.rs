@@ -6,6 +6,20 @@ pub trait SendInputApi {
     fn send_input(&self, input_list: &[INPUT]) -> u32;
 }
 
+enum SendInputType{
+    Fast,Normal,Slow(u64)
+}
+struct SendInputSelector{}
+impl SendInputSelector{
+    fn create(ty:SendInputType)->Box<dyn SendInputApi>{
+        match ty{
+            SendInputType::Fast=>{Box::new(SendInputApiFastImpl::default())},
+            SendInputType::Normal=>{Box::new(SendInputApiImpl::default())},
+            SendInputType::Slow(t)=>{Box::new(SendInputApiDelayedImpl::new(t))},
+        }
+    }
+}
+
 struct SendInputApiImpl {}
 impl Default for SendInputApiImpl {
     fn default() -> Self {
@@ -14,10 +28,25 @@ impl Default for SendInputApiImpl {
 }
 impl SendInputApi for SendInputApiImpl {
     fn send_input(&self, input_list: &[INPUT]) -> u32 {
+        unsafe { 
+            for input in input_list{
+                SendInput(&[*input], std::mem::size_of::<INPUT>() as i32);
+            }
+        }
+        0
+    }
+}
+struct SendInputApiFastImpl {}
+impl Default for SendInputApiFastImpl {
+    fn default() -> Self {
+        SendInputApiFastImpl {}
+    }
+}
+impl SendInputApi for SendInputApiFastImpl {
+    fn send_input(&self, input_list: &[INPUT]) -> u32 {
         unsafe { SendInput(input_list, std::mem::size_of::<INPUT>() as i32) }
     }
 }
-
 struct SendInputApiDelayedImpl {
     delay_millis: u64,
 }
@@ -63,7 +92,8 @@ impl KeyboardTrait for KeyboardImpl {
                 let input = keyinput_generator_detail(
                     keycode.vk(),
                     keycode.scan_code(),
-                    KEYBD_EVENT_FLAGS(keycode.flags | flags),
+                    KEYBD_EVENT_FLAGS(keycode.flags() | flags),
+                    keycode.extra_info()
                 );
                 input_list.push(input);
             }
@@ -90,17 +120,14 @@ impl KeyboardImpl {
     }
 }
 
-pub fn keyinput_generator_detail(vk: VIRTUAL_KEY, scan: u16, flags: KEYBD_EVENT_FLAGS) -> INPUT {
+pub fn keyinput_generator_detail(vk: VIRTUAL_KEY, scan: u16, flags: KEYBD_EVENT_FLAGS,extra_info:usize) -> INPUT {
     let mut kbd = KEYBDINPUT::default();
     let vk = vk;
     kbd.wVk = vk;
     kbd.wScan = scan;
     kbd.dwFlags = flags;
     kbd.time = 0;
-    // ExtraInfoは特に意味のある値ではない。
-    // このアプリから生成されたことを主張するだけの数値
-    // KBDLLHOOKSTRUCT.dw_flagsでも判別は可能であるのであくまでもデバッグ支援用の値となる
-    kbd.dwExtraInfo = 12345;
+    kbd.dwExtraInfo = extra_info;
 
     let mut input = INPUT::default();
     input.r#type = INPUT_KEYBOARD;

@@ -150,3 +150,27 @@ fn keyboard_impl_test2() {
 //     }
 //     keyboard_impl.send_key();
 // }
+
+// #[test]
+// fn input_test3() {
+//     let mut kbd = Keyboard::new();
+//     kbd.append_input_chain(
+//         KeycodeBuilder::default()
+//             .vk(VK_LCONTROL.0)
+//             .scan_code(virtual_key_to_scancode(VK_LCONTROL))
+//             .key_send_mode(KeySendMode::KeyDown)
+//             .build(),
+//     );
+//     KeycodeBuilder::default()
+//         .char_build('v')
+//         .iter()
+//         .for_each(|key_code| kbd.append_input_chain(key_code.clone()));
+//     kbd.append_input_chain(
+//         KeycodeBuilder::default()
+//             .vk(VK_LCONTROL.0)
+//             .scan_code(virtual_key_to_scancode(VK_LCONTROL))
+//             .key_send_mode(KeySendMode::KeyUp)
+//             .build(),
+//     );
+//     kbd.send_key();
+// }

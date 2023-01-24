@@ -37,10 +37,11 @@ pub trait KeyboardTrait {
 
 #[derive(Debug, Clone)]
 pub struct KeyCode {
-    pub vk: VIRTUAL_KEY,
-    pub scan_code: u16,
-    pub flags: u32,
-    pub key_send_mode: KeySendMode,
+    vk: VIRTUAL_KEY,
+    scan_code: u16,
+    flags: u32,
+    key_send_mode: KeySendMode,
+    extra_info: usize,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -60,7 +61,14 @@ impl KeyCode {
     pub fn key_send_mode(&self) -> KeySendMode {
         self.key_send_mode
     }
+    pub fn extra_info(&self)->usize{
+        self.extra_info
+    }
+    pub fn flags(&self)->u32{
+        self.flags
+    }
 }
+
 impl Default for KeyCode {
     fn default() -> Self {
         KeyCode {
@@ -68,6 +76,7 @@ impl Default for KeyCode {
             scan_code: 0,
             flags: 0,
             key_send_mode: KeySendMode::Immediate,
+            extra_info:12345 // 物理キー入力は0なのでそれとは違う値なら何でもいい。
         }
     }
 }
@@ -191,6 +200,10 @@ impl KeycodeBuilder {
     }
     pub fn flags(&mut self, flags: u32) -> &mut Self {
         self.key_code.flags = flags;
+        self
+    }
+    pub fn extra_info(&mut self,info:usize)->&mut Self{
+        self.key_code.extra_info=info;
         self
     }
     pub fn build(&self) -> KeyCode {
