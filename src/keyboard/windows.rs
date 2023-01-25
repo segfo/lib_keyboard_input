@@ -24,15 +24,18 @@ impl KeyboardTrait for Keyboard {
     fn send_key(&mut self) {
         self.inner.send_key()
     }
-
     fn append_input_chain(&mut self, key_code: KeyCode) {
         self.inner.append_input_chain(key_code)
+    }
+    fn clear_input_chain(&mut self) {
+        self.inner.keycode_chain.clear()
     }
 }
 
 pub trait KeyboardTrait {
     fn send_key(&mut self);
     fn append_input_chain(&mut self, key_code: KeyCode);
+    fn clear_input_chain(&mut self);
 }
 
 #[derive(Debug, Clone)]

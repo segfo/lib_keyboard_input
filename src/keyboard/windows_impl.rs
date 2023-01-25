@@ -103,6 +103,10 @@ impl KeyboardTrait for KeyboardImpl {
     fn append_input_chain(&mut self, key_code: KeyCode) {
         self.keycode_chain.push(key_code)
     }
+
+    fn clear_input_chain(&mut self) {
+        self.keycode_chain.clear()
+    }
 }
 
 impl KeyboardImpl {
