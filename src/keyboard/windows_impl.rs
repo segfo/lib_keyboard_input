@@ -6,20 +6,6 @@ pub trait SendInputApi {
     fn send_input(&self, input_list: &[INPUT]) -> u32;
 }
 
-enum SendInputType{
-    Fast,Normal,Slow(u64)
-}
-struct SendInputSelector{}
-impl SendInputSelector{
-    fn create(ty:SendInputType)->Box<dyn SendInputApi>{
-        match ty{
-            SendInputType::Fast=>{Box::new(SendInputApiFastImpl::default())},
-            SendInputType::Normal=>{Box::new(SendInputApiImpl::default())},
-            SendInputType::Slow(t)=>{Box::new(SendInputApiDelayedImpl::new(t))},
-        }
-    }
-}
-
 struct SendInputApiImpl {}
 impl Default for SendInputApiImpl {
     fn default() -> Self {

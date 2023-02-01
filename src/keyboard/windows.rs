@@ -111,7 +111,7 @@ impl ShiftIgnore {
     }
 }
 impl ShiftKeyAction for ShiftIgnore {
-    fn action(&mut self, v: &mut Vec<KeyCode>) {}
+    fn action(&mut self, _v: &mut Vec<KeyCode>) {}
 }
 struct Shift {
     state: bool,
@@ -159,7 +159,7 @@ impl KeycodeBuilder {
     pub fn char_build(&mut self, char: char) -> Vec<KeyCode> {
         let mut utf16 = Vec::new();
         if char.is_ascii() {
-            let (shift, ctrl, vk) = unsafe {
+            let (shift, _ctrl, vk) = unsafe {
                 let kl = GetKeyboardLayout(0);
                 // 文字 から VirtualKey へ変換する
                 let vk = VIRTUAL_KEY(VkKeyScanExA(CHAR(char as u8), kl) as u16);
